@@ -11,8 +11,8 @@ import './globals.css'
 const font = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Genius',
-  description: 'AI Platform',
+  title: 'Pixel Dojo',
+  description: 'The Number One Generative AI Playground',
 }
 
 export default async function RootLayout({

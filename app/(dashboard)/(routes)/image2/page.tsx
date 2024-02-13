@@ -1,6 +1,5 @@
 "use client";
 
-import * as z from "zod";
 import axios from "axios";
 import Image from "next/image";
 import { useState } from "react";
@@ -20,7 +19,7 @@ import { Empty } from "@/components/ui/empty";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useProModal } from "@/hooks/use-pro-modal";
 
-import { amountOptions, formSchema, resolutionOptions } from "./constants";
+import { formSchema, modelOptions, resolutionOptions } from "./constants";
 
 const PhotoPage = () => {
   const proModal = useProModal();
@@ -31,9 +30,9 @@ const PhotoPage = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
-      amount: "1",
-      resolution: "1024x1024"
-    }
+      modelEndpoint: modelOptions[0].value,
+      resolution: "1024x1024",
+    },
   });
 
   const isLoading = form.formState.isSubmitting;
@@ -56,9 +55,9 @@ const PhotoPage = () => {
     } finally {
       router.refresh();
     }
-  }
+  };
 
-  return ( 
+  return (
     <div>
       <Heading
         title="Image Generation"
@@ -69,30 +68,16 @@ const PhotoPage = () => {
       />
       <div className="px-4 lg:px-8">
         <Form {...form}>
-          <form 
-            onSubmit={form.handleSubmit(onSubmit)} 
-            className="
-              rounded-lg 
-              border 
-              w-full 
-              p-4 
-              px-3 
-              md:px-6 
-              focus-within:shadow-sm
-              grid
-              grid-cols-12
-              gap-2
-            "
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="rounded-lg border w-full p-4 px-3 md:px-6 focus-within:shadow-sm grid grid-cols-12 gap-2">
             <FormField
               name="prompt"
               render={({ field }) => (
-                <FormItem className="col-span-12 lg:col-span-6">
+                <FormItem className="col-span-12">
                   <FormControl className="m-0 p-0">
                     <Input
                       className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                       disabled={isLoading} 
-                      placeholder="A picture of a horse in Swiss alps" 
+                      placeholder="Enter your prompt here" 
                       {...field}
                     />
                   </FormControl>
@@ -101,22 +86,21 @@ const PhotoPage = () => {
             />
             <FormField
               control={form.control}
-              name="amount"
+              name="modelEndpoint"
               render={({ field }) => (
-                <FormItem className="col-span-12 lg:col-span-2">
+                <FormItem className="col-span-12 lg:col-span-4">
                   <Select 
                     disabled={isLoading} 
                     onValueChange={field.onChange} 
-                    value={field.value} 
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} />
+                        <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {amountOptions.map((option) => (
+                      {modelOptions.map((option) => (
                         <SelectItem 
                           key={option.value} 
                           value={option.value}
@@ -133,16 +117,15 @@ const PhotoPage = () => {
               control={form.control}
               name="resolution"
               render={({ field }) => (
-                <FormItem className="col-span-12 lg:col-span-2">
+                <FormItem className="col-span-12 lg:col-span-4">
                   <Select 
                     disabled={isLoading} 
                     onValueChange={field.onChange} 
-                    value={field.value} 
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} />
+                        <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -159,41 +142,37 @@ const PhotoPage = () => {
                 </FormItem>
               )}
             />
-            <Button className="col-span-12 lg:col-span-2 w-full" type="submit" disabled={isLoading} size="icon">
+            <Button className="col-span-12 lg:col-span-2 w-full" type="submit" disabled={isLoading}>
               Generate
             </Button>
           </form>
         </Form>
-        {isLoading && (
-          <div className="p-20">
-            <Loader />
-          </div>
-        )}
-        {photos.length === 0 && !isLoading && (
-          <Empty label="No images generated." />
-        )}
+        {isLoading && <Loader className="p-20" />}
+        {photos.length === 0 && !isLoading && <Empty label="No images generated." />}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
           {photos.map((src) => (
-            <Card key={src} className="rounded-lg overflow-hidden">
-              <div className="relative aspect-square">
-                <Image
-                  fill
-                  alt="Generated"
-                  src={src}
-                />
+                    <Card key={src} className="rounded-lg overflow-hidden">
+                      <div className="relative aspect-square">
+                      <Image
+                        fill
+                        alt="Generated"
+                        src={src}
+                        // Removed width and height properties for compatibility with fill
+                        className="object-cover" // Ensure the image covers the area of the div, adjust as necessary
+                      />
+                    </div>
+                      <CardFooter className="p-2">
+                        <Button onClick={() => window.open(src)} variant="secondary" className="w-full">
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
               </div>
-              <CardFooter className="p-2">
-                <Button onClick={() => window.open(src)} variant="secondary" className="w-full">
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
-   );
-}
- 
+            </div>
+  );
+};
+
 export default PhotoPage;

@@ -31,6 +31,12 @@ const routes = [
     href: '/image',
   },
   {
+    label: 'Image Generation 2',
+    icon: ImageIcon,
+    color: "text-pink-700",
+    href: '/image2',
+  },
+  {
     label: 'Video Generation',
     icon: VideoIcon,
     color: "text-orange-700",
@@ -72,7 +78,7 @@ export const Sidebar = ({
             <Image fill alt="Logo" src="/logo.png" />
           </div>
           <h1 className={cn("text-2xl font-bold", poppins.className)}>
-            Genius
+            Pixel Dojo
           </h1>
         </Link>
         <div className="space-y-1">
